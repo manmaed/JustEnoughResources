@@ -60,8 +60,8 @@ public class WorldGenAdapter {
                 JsonElement silk = obj.get("silktouch");
                 boolean silktouch = silk != null && silk.getAsBoolean();
 
-                JsonElement dimElement = obj.get("dim");
-                String dim = dimElement != null ? dimElement.getAsString() : "";
+                String dim = obj.get("dim").getAsString();
+                String[] dimParts = dim.split(":");
 
                 String[] blockParts = block.split(":");
 
@@ -125,8 +125,8 @@ public class WorldGenAdapter {
                     blockStack = dropList.get(0).item.copy();
                     blockStack.setCount(1);
                 }
-
-                WorldGenRegistry.getInstance().registerEntry(new WorldGenEntry(blockStack, distribution, getRestriction(dim), silktouch, dropList.toArray(new LootDrop[dropList.size()])));
+                System.out.println("Dims: " + dimParts[0] + " and " + dimParts[1]);
+                WorldGenRegistry.getInstance().registerEntry(new WorldGenEntry(blockStack, distribution, getRestriction(dimParts[0], dimParts[1]), silktouch, dropList.toArray(new LootDrop[dropList.size()])));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -137,8 +137,8 @@ public class WorldGenAdapter {
 
     private static Map<ResourceKey<Level>, Restriction> map = new HashMap<>();
 
-    private static Restriction getRestriction(String dim) {
-        ResourceKey<Level> worldRegistryKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace(dim));
+    private static Restriction getRestriction(String modid, String dim) {
+        ResourceKey<Level> worldRegistryKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(modid, dim));
         return map.computeIfAbsent(worldRegistryKey, k -> new Restriction(new DimensionRestriction(worldRegistryKey)));
     }
 }
